@@ -433,9 +433,8 @@ describe("Test ts-retrofit.", () => {
 
   test("Test Interceptor Abstract Class", async () => {
     class AddHeaderInterceptor extends RequestInterceptor {
-      public role = "interceptor";
-
-      public onFulfilled(config: AxiosRequestConfig) {
+      role = 'interceptor';
+      onFulfilled(config: import("axios").InternalAxiosRequestConfig) {
         switch (config.method) {
           case "get":
           case "GET":
@@ -443,7 +442,6 @@ describe("Test ts-retrofit.", () => {
               config.headers.get["X-Role"] = this.role;
             }
             break;
-
           default:
             break;
         }
@@ -545,8 +543,8 @@ describe("Test ts-retrofit.", () => {
     try {
       const response = await service.getSomethingAbsolute();
     } catch (err) {
-      // @ts-ignore
-      expect(err.config.url).toEqual("https://absolute-foobar.com");
+      const axiosErr = err as { config: { url: string } };
+      expect(axiosErr.config.url).toEqual("https://absolute-foobar.com");
     }
   });
 
@@ -652,10 +650,9 @@ describe("Test ts-retrofit.", () => {
     try {
       await service.boom();
     } catch (err) {
-      // @ts-ignore
-      expect(err.response.config.url).toEqual(`${TEST_SERVER_ENDPOINT}/boom`);
-      // @ts-ignore
-      expect(err.response.status).toEqual(404);
+      const axiosErr = err as { response: { config: { url: string }, status: number } };
+      expect(axiosErr.response.config.url).toEqual(`${TEST_SERVER_ENDPOINT}/boom`);
+      expect(axiosErr.response.status).toEqual(404);
     }
   });
 

@@ -1,6 +1,6 @@
 import {
   ResponseType as AxiosResponseType,
-  AxiosTransformer, AxiosRequestConfig,
+  AxiosRequestConfig
 } from "axios";
 import { HttpMethod } from "./constants";
 import { BaseService } from "./baseService";
@@ -32,6 +32,7 @@ export type QueryArrayFormat = "indices" | "brackets" | "repeat" | "comma";
 export interface QueryOptions {
   arrayFormat?: QueryArrayFormat; // default is brackets
 }
+
 
 /**
  * Ensure the `__meta__` attribute is in the target object and `methodName` has been initialized.
@@ -242,6 +243,7 @@ export const QueryArrayFormat = (queryArrayFormat: QueryArrayFormat) => {
   };
 };
 
+
 /**
  * Set static query for API endpoint.
  * @param query
@@ -382,7 +384,7 @@ export const ResponseType = (responseType: AxiosResponseType) => {
  *         })
  * @constructor
  */
-export const RequestTransformer = (transformer: AxiosTransformer) => {
+export const RequestTransformer = (transformer: AxiosRequestConfig) => {
   return (target: any, methodName: string) => {
     ensureMeta(target, methodName);
     target.__meta__[methodName].requestTransformer = transformer;
@@ -399,7 +401,7 @@ export const RequestTransformer = (transformer: AxiosTransformer) => {
  *         })
  * @constructor
  */
-export const ResponseTransformer = (transformer: AxiosTransformer) => {
+export const ResponseTransformer = (transformer: AxiosRequestConfig) => {
   return (target: any, methodName: string) => {
     ensureMeta(target, methodName);
     target.__meta__[methodName].responseTransformer = transformer;
@@ -485,4 +487,43 @@ export const Deprecated = (hint?: string) => {
     target.__meta__[methodName].deprecated = true;
     target.__meta__[methodName].deprecatedHint = hint;
   };
+};
+
+/**
+ * Set Signal for API endpoint.
+ * @param target
+ * @param methodName
+ * @param paramIndex
+ * @sample @Signal signal: Signal
+ * @constructor
+ */
+export const Signal = (target: any, methodName: string, paramIndex: number) => {
+  ensureMeta(target, methodName);
+  target.__meta__[methodName].signalIndex = paramIndex;
+};
+
+/**
+ * Set Extra data for API endpoint.
+ * @param target
+ * @param methodName
+ * @param paramIndex
+ * @sample @ExtraMap extra: Object
+ * @constructor
+ */
+export const ExtraMap = (target: any, methodName: string, paramIndex: number) => {
+  ensureMeta(target, methodName);
+  target.__meta__[methodName].extraMapIndex = paramIndex;
+};
+
+/**
+ * Set Upload progress function for API endpoint.
+ * @param target
+ * @param methodName
+ * @param paramIndex
+ * @sample @OnUploadProgress OnUploadProgress: (event) => void
+ * @constructor
+ */
+export const OnUploadProgress = (target: any, methodName: string, paramIndex: number) => {
+  ensureMeta(target, methodName);
+  target.__meta__[methodName].onUploadProgressIndex = paramIndex;
 };

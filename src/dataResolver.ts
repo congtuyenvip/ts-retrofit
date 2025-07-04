@@ -16,7 +16,7 @@ export class FormUrlencodedResolver extends BaseDataResolver {
 
   public resolve(headers: any, data: any): any {
     const deepStringify = (obj: any) => {
-      const res = {};
+      const res: Record<string, any> = {};
       for (const key in obj) {
         if (!obj.hasOwnProperty(key)) {
           continue;
@@ -52,18 +52,20 @@ export class MultiPartResolver extends BaseDataResolver {
           formData.append(key, element, options);
         }
       } else {
+        if (data[key].value === undefined) continue;
+
         const options = this.getFormDataAppendOptions(data[key]);
-        formData.append(key, data[key].value, options);
+        formData.append(key, data[key].value);
       }
     }
     return formData;
   }
 
   private getFormDataAppendOptions<T>(partDescriptor: PartDescriptor<T>): AppendOptions {
-    const options = {};
+    const options: Record<string, any> = {};
     Object.keys(partDescriptor).forEach((key) => {
       if (key !== "value") {
-        options[key] = partDescriptor[key];
+        options[key] = (partDescriptor as any)[key];
       }
     });
     return options;
