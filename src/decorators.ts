@@ -1,6 +1,6 @@
 import {
   ResponseType as AxiosResponseType,
-  AxiosRequestConfig, AxiosRequestTransformer, AxiosResponseTransformer
+  AxiosRequestConfig
 } from "axios";
 import { HttpMethod } from "./constants";
 import { BaseService } from "./baseService";
@@ -384,7 +384,7 @@ export const ResponseType = (responseType: AxiosResponseType) => {
  *         })
  * @constructor
  */
-export const RequestTransformer = (transformer: AxiosRequestTransformer) => {
+export const RequestTransformer = (transformer: AxiosRequestConfig) => {
   return (target: any, methodName: string) => {
     ensureMeta(target, methodName);
     target.__meta__[methodName].requestTransformer = transformer;
@@ -401,7 +401,7 @@ export const RequestTransformer = (transformer: AxiosRequestTransformer) => {
  *         })
  * @constructor
  */
-export const ResponseTransformer = (transformer: AxiosResponseTransformer) => {
+export const ResponseTransformer = (transformer: AxiosRequestConfig) => {
   return (target: any, methodName: string) => {
     ensureMeta(target, methodName);
     target.__meta__[methodName].responseTransformer = transformer;

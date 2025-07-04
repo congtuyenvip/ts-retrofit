@@ -1,5 +1,5 @@
 import * as qs from "qs";
-import axios, {AxiosRequestConfig, AxiosResponse, AxiosInstance, InternalAxiosRequestConfig} from "axios";
+import axios, {AxiosRequestConfig, AxiosResponse, AxiosInstance} from "axios";
 import FormData from "form-data";
 import {DataResolverFactory} from "./dataResolver";
 import {HttpMethod} from "./constants";
@@ -184,7 +184,6 @@ export class BaseService {
             headers,
             params: query,
             data,
-            signal,
             extraMap,
             onUploadProgress,
         };
@@ -415,7 +414,7 @@ export class BaseService {
 }
 
 export type RequestInterceptorFunction =
-    (value: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>;
+    (value: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>;
 export type ResponseInterceptorFunction<T = any> =
     (value: AxiosResponse<T>) => AxiosResponse<T> | Promise<AxiosResponse<T>>;
 
@@ -426,7 +425,7 @@ abstract class BaseInterceptor {
 }
 
 export abstract class RequestInterceptor extends BaseInterceptor {
-    public abstract onFulfilled(value: InternalAxiosRequestConfig): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>;
+    public abstract onFulfilled(value: AxiosRequestConfig): AxiosRequestConfig | Promise<AxiosRequestConfig>;
 }
 
 export abstract class ResponseInterceptor<T = any> extends BaseInterceptor {
@@ -520,11 +519,11 @@ class HttpClient {
         builder.requestInterceptors.forEach((interceptor) => {
             if (interceptor instanceof RequestInterceptor) {
                 this.axios.interceptors.request.use(
-                    interceptor.onFulfilled.bind(interceptor),
+                    interceptor.onFulfilled.bind(interceptor) as any,
                     interceptor.onRejected.bind(interceptor),
                 );
             } else {
-                this.axios.interceptors.request.use(interceptor);
+                this.axios.interceptors.request.use(interceptor as any);
             }
         });
 
@@ -549,7 +548,7 @@ class HttpClient {
     }
 
     public useRequestInterceptor(interceptor: RequestInterceptorFunction): number {
-        return this.axios.interceptors.request.use(interceptor);
+        return this.axios.interceptors.request.use(interceptor as any);
     }
 
     public useResponseInterceptor(interceptor: ResponseInterceptorFunction): number {
