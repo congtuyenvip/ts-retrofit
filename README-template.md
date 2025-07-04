@@ -342,6 +342,49 @@ class ItemService extends BaseService {
 }
 ```
 
+### QueryArrayFormat
+
+* Position: Method
+
+`QueryArrayFormat` decorator declares that what kind of array format should be used in query.
+
+```typescript
+@BasePath("/api/v1")
+class ItemService extends BaseService {
+  // getItemsWithQueryArrayFormatIndices(["food", "book", "pet"])
+  // GET ${ENDPOINT}/api/v1/items?categories[0]=food&categories[1]=book&categories[2]=pet
+  @GET("/items")
+  @QueryArrayFormat("indices")
+  async getItemsWithQueryArrayFormatIndices(
+    @Query("categories") categories: string[]
+  ): Promise<Response<Array<Item>>> { return <Response<Array<Item>>> {} };
+  
+  // getItemsWithQueryArrayFormatBrackets(["food", "book", "pet"])
+  // GET ${ENDPOINT}/api/v1/items?categories[]=food&categories[]=book&categories[]=pet
+  @GET("/items")
+  @QueryArrayFormat("brackets")
+  async getItemsWithQueryArrayFormatBrackets(
+    @Query("categories") categories: string[]
+  ): Promise<Response<Array<Item>>> { return <Response<Array<Item>>> {} };
+  
+  // getItemsWithQueryArrayFormatRepeat(["food", "book", "pet"])
+  // GET ${ENDPOINT}/api/v1/items?categories=food&categories=book&categories=pet
+  @GET("/items")
+  @QueryArrayFormat("repeat")
+  async getItemsWithQueryArrayFormatRepeat(
+    @Query("categories") categories: string[]
+  ): Promise<Response<Array<Item>>> { return <Response<Array<Item>>> {} };
+  
+  // getItemsWithQueryArrayFormatComma(["food", "book", "pet"])
+  // GET ${ENDPOINT}/api/v1/items?categories=food,book,pet
+  @GET("/items")
+  @QueryArrayFormat("comma")
+  async getItemsWithQueryArrayFormatComma(
+    @Query("categories") categories: string[]
+  ): Promise<Response<Array<Item>>> { return <Response<Array<Item>>> {} };
+}
+```
+
 ### Queries
 
 - Position: Method
@@ -597,39 +640,57 @@ export class GraphQLService extends BaseService {
 }
 ```
 
+### Deprecated
+
+* Position: Method
+
+`Deprecated` decorator marks a method is deprecated.
+
+```typescript
+@BasePath("/api/v1")
+class ItemService extends BaseService {
+  // GET ${ENDPOINT}/api/v1/items
+  @GET("/items")
+  @Deprecated("This method is deprecated")
+  async getItems(): Promise<Response<Array<Item>>> { return <Response<Array<Item>>> {} };
+}
+```
+
 ### Decorators Summary
 
-|      Category       |         Name         |               Description                | Decorator Position |                 Example                  |
-| :-----------------: | :------------------: | :--------------------------------------: | :----------------: | :--------------------------------------: |
-|     HTTP Method     |         @GET         |                GET Method                |       Method       |              @GET("/users")              |
-|     HTTP Method     |        @POST         |               POST Method                |       Method       |             @POST("/users")              |
-|     HTTP Method     |         @PUT         |                PUT Method                |       Method       |         @PUT("/users/{userId}")          |
-|     HTTP Method     |        @PATCH        |               PATCH Method               |       Method       |        @PATCH("/users/{userId}")         |
-|     HTTP Method     |       @DELETE        |              DELETE Method               |       Method       |        @DELETE("/users/{userId}")        |
-|     HTTP Method     |        @HEAD         |               HEAD Method                |       Method       |         @HEAD("/users/{userId}")         |
-|     HTTP Method     |       @OPTIONS       |              OPTIONS Method              |       Method       |       @OPTIONS("/users/{userId}")        |
-|      Base Path      |      @BasePath       | Specifying the base path of a series of API endpoints |       Class        |           @BasePath("/api/v1")           |
-|   Static Headers    |       @Headers       | Specifying the static headers of API endpoint |       Method       | @Headers({ "content-type": "application/x-www-form-urlencoded",   "Accept": "application/json" }) |
-|  Header Parameter   |       @Header        |           Parameterized header           |  Method Parameter  |            @Header("X-Token")            |
-|  Header Parameters  |      @HeaderMap      |           Parameterized header           |  Method Parameter  |                @HeaderMap                |
-|   Path Parameter    |        @Path         |   Specifying parameter in path of API    |  Method Parameter  |             @Path("userId")              |
-|        Body         |        @Body         |           Specifying body data           |  Method Parameter  |                  @Body                   |
-|    Static Query     |       @Queries       |       Specifying static query data       |       Method       | @Queries({ page: 1,   size: 20,   sort: "createdAt:desc" }) |
-|   Query Parameter   |        @Query        |           Parameterized query            |  Method Parameter  |             @Query("group")              |
-|  Query Parameters   |      @QueryMap       |           Parameterized query            |  Method Parameter  |                @QueryMap                 |
-|   Static Headers    |   @FormUrlEncoded    | Specifying "content-type" to be "application/x-www-form-urlencoded" |       Method       |             @FormUrlEncoded              |
-|   Field Parameter   |        @Field        | Specifying field in method parameter, only takes effect when method has been decorated by @FormUrlEncoded |  Method Parameter  |              @Field("name")              |
-|  Field Parameters   |      @FieldMap       | Specifying field map in method parameter, only takes effect when method has been decorated by @FormUrlEncoded |  Method Parameter  |                @FieldMap                 |
-|   Static Headers    |      @Multipart      | Specifying "content-type" to be "multipart/form-data" |       Method       |                @Multipart                |
-|   Part Parameters   |        @Part         | Specifying field map in method parameter, only takes effect when method has been decorated by @Multipart |  Method Parameter  |              @Part("name")               |
-|      Response       |    @ResponseType     | Specifying the response type in axios config |       Method       |         @ResponseType("stream")          |
-| RequestTransformer  | @RequestTransformer  | Specifying the request transformer in axios config |       Method       | @RequestTransformer((data: any, headers?: any) => { data.foo = 'foo'; return JSON.stringify(data); }) |
-| ResponseTransformer | @ResponseTransformer | Specifying the response transformer in axios config |       Method       | @ResponseTransformer((data: any, headers?: any) => { const json = JSON.parse(data); json.foo = 'foo'; return json; }) |
-|       Timeout       |       @Timeout       |  Specifying the timeout in axios config  |       Method       |              @Timeout(5000)              |
-|   ResponseStatus    |   @ResponseStatus    | Declare response status code for method, do nothing just a declaration |       Method       |           @ResponseStatus(204)           |
-|       Config        |       @Config        | A direct way to set config for a request in axios |       Method       |       @Config({ maxRedirects: 1 })       |
-|       GraphQL       |       @GraphQL       |  Declares query for a GraphQL request.   |       Method       |   @GraphQL(gqlQuery, "operationName")    |
-|  GraphQLVariables   |  @GraphQLVariables   | Decorator declares variables for a GraphQL request. |       Method       |            @GraphQLVariables             |
+|      Category       |         Name         |                         Description                          | Decorator Position |                           Example                            |
+| :-----------------: | :------------------: | :----------------------------------------------------------: | :----------------: | :----------------------------------------------------------: |
+|     HTTP Method     |         @GET         |                          GET Method                          |       Method       |                        @GET("/users")                        |
+|     HTTP Method     |        @POST         |                         POST Method                          |       Method       |                       @POST("/users")                        |
+|     HTTP Method     |         @PUT         |                          PUT Method                          |       Method       |                   @PUT("/users/{userId}")                    |
+|     HTTP Method     |        @PATCH        |                         PATCH Method                         |       Method       |                  @PATCH("/users/{userId}")                   |
+|     HTTP Method     |       @DELETE        |                        DELETE Method                         |       Method       |                  @DELETE("/users/{userId}")                  |
+|     HTTP Method     |        @HEAD         |                         HEAD Method                          |       Method       |                   @HEAD("/users/{userId}")                   |
+|     HTTP Method     |       @OPTIONS       |                        OPTIONS Method                        |       Method       |                 @OPTIONS("/users/{userId}")                  |
+|      Base Path      |      @BasePath       |    Specifying the base path of a series of API endpoints     |       Class        |                     @BasePath("/api/v1")                     |
+|   Static Headers    |       @Headers       |        Specifying the static headers of API endpoint         |       Method       | @Headers({ "content-type": "application/x-www-form-urlencoded",   "Accept": "application/json" }) |
+|  Header Parameter   |       @Header        |                     Parameterized header                     |  Method Parameter  |                      @Header("X-Token")                      |
+|  Header Parameters  |      @HeaderMap      |                     Parameterized header                     |  Method Parameter  |                          @HeaderMap                          |
+|   Path Parameter    |        @Path         |             Specifying parameter in path of API              |  Method Parameter  |                       @Path("userId")                        |
+|        Body         |        @Body         |                     Specifying body data                     |  Method Parameter  |                            @Body                             |
+| Query Array Format  |  @QueryArrayFormat   |                Specifying query array format                 |       Method       |                 @QueryArrayFormat('repeat')                  |
+|    Static Query     |       @Queries       |                 Specifying static query data                 |       Method       | @Queries({ page: 1,   size: 20,   sort: "createdAt:desc" })  |
+|   Query Parameter   |        @Query        |                     Parameterized query                      |  Method Parameter  |                       @Query("group")                        |
+|  Query Parameters   |      @QueryMap       |                     Parameterized query                      |  Method Parameter  |                          @QueryMap                           |
+|   Static Headers    |   @FormUrlEncoded    | Specifying "content-type" to be "application/x-www-form-urlencoded" |       Method       |                       @FormUrlEncoded                        |
+|   Field Parameter   |        @Field        | Specifying field in method parameter, only takes effect when method has been decorated by @FormUrlEncoded |  Method Parameter  |                        @Field("name")                        |
+|  Field Parameters   |      @FieldMap       | Specifying field map in method parameter, only takes effect when method has been decorated by @FormUrlEncoded |  Method Parameter  |                          @FieldMap                           |
+|   Static Headers    |      @Multipart      |    Specifying "content-type" to be "multipart/form-data"     |       Method       |                          @Multipart                          |
+|   Part Parameters   |        @Part         | Specifying field map in method parameter, only takes effect when method has been decorated by @Multipart |  Method Parameter  |                        @Part("name")                         |
+|      Response       |    @ResponseType     |         Specifying the response type in axios config         |       Method       |                   @ResponseType("stream")                    |
+| RequestTransformer  | @RequestTransformer  |      Specifying the request transformer in axios config      |       Method       | @RequestTransformer((data: any, headers?: any) => { data.foo = 'foo'; return JSON.stringify(data); }) |
+| ResponseTransformer | @ResponseTransformer |     Specifying the response transformer in axios config      |       Method       | @ResponseTransformer((data: any, headers?: any) => { const json = JSON.parse(data); json.foo = 'foo'; return json; }) |
+|       Timeout       |       @Timeout       |            Specifying the timeout in axios config            |       Method       |                        @Timeout(5000)                        |
+|   ResponseStatus    |   @ResponseStatus    | Declare response status code for method, do nothing just a declaration |       Method       |                     @ResponseStatus(204)                     |
+|       Config        |       @Config        |      A direct way to set config for a request in axios       |       Method       |                 @Config({ maxRedirects: 1 })                 |
+|       GraphQL       |       @GraphQL       |            Declares query for a GraphQL request.             |       Method       |             @GraphQL(gqlQuery, "operationName")              |
+|  GraphQLVariables   |  @GraphQLVariables   |          Declares variables for a GraphQL request.           |       Method       |                      @GraphQLVariables                       |
+|     Deprecated      |     @Deprecated      |                 Marks a method is deprecated                 |       Method       |  @Deprecated()<br>@Deprecated("This method is deprecated")   |
 
 ## Test
 

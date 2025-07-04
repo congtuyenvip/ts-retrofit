@@ -1,7 +1,8 @@
 import {
   GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, BasePath, Header, Queries, Headers, Path, Query, QueryMap, Body,
   FormUrlEncoded, Field, FieldMap, Multipart, ResponseType, Part, PartDescriptor, BaseService, Response, HeaderMap,
-  RequestTransformer, ResponseTransformer, Timeout, ResponseStatus, Config, GraphQL, GraphQLVariables
+  RequestTransformer, ResponseTransformer, Timeout, ResponseStatus, Config, GraphQL, GraphQLVariables, Deprecated,
+  QueryArrayFormat,
 } from "../../src";
 
 export const TEST_SERVER_HOST = "http://localhost";
@@ -75,6 +76,10 @@ export class UserService extends BaseService {
 
   @OPTIONS("/users/{userId}")
   async optionsUser(@Header("X-Token") token: string, @Path("userId") userId: number): Promise<Response> { return <Response>{} };
+
+  @GET("/users/{userId}/pets")
+  @Deprecated("This method is deprecated on version v2.")
+  async getUserPets(@Header("X-Token") token: string, @Path("userId") userId: number): Promise<Response> { return <Response>{} };
 }
 
 @BasePath(API_PREFIX)
@@ -111,6 +116,22 @@ export class PostService extends BaseService {
   })
   async getPosts1(@Query('group') group: string): Promise<Response> { return <Response>{} };
 
+  @GET("/posts")
+  @QueryArrayFormat('indices')
+  async getPostsWithQueryArrayFormatIndices(@Query('groups') groups: string[]): Promise<Response> { return <Response>{} };
+
+  @GET("/posts")
+  @QueryArrayFormat('brackets')
+  async getPostsWithQueryArrayFormatBrackets(@Query('groups') groups: string[]): Promise<Response> { return <Response>{} };
+
+  @GET("/posts")
+  @QueryArrayFormat('repeat')
+  async getPostsWithQueryArrayFormatRepeat(@Query('groups') groups: string[]): Promise<Response> { return <Response>{} };
+
+  @GET("/posts")
+  @QueryArrayFormat('comma')
+  async getPostsWithQueryArrayFormatComma(@Query('groups') groups: string[]): Promise<Response> { return <Response>{} };
+
   @POST("/posts")
   @FormUrlEncoded
   async createPost(@Field("title") title: string, @Field("content") content: string): Promise<Response> { return <Response>{} };
@@ -128,7 +149,11 @@ export class PostService extends BaseService {
 export class FileService extends BaseService {
   @POST("/upload")
   @Multipart
-  async upload(@Part("bucket") bucket: PartDescriptor<string>, @Part("file") file: PartDescriptor<Buffer>): Promise<Response> { return <Response>{} };
+  async upload(
+    @Part("bucket") bucket: PartDescriptor<string>,
+    @Part("metadata") metadata: PartDescriptor<string>,
+    @Part("file") file: PartDescriptor<Buffer>,
+  ): Promise<Response> { return <Response>{} };
 
   @GET("/file")
   @ResponseType("stream")
